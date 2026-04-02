@@ -690,6 +690,7 @@ class FigureRenderer {
       this.figGroup.add(outline);
     }
 
+    this.figGroup.scale.setScalar(0.85);   // desktop figures rendered 15% smaller
     this.initQuat.copy(quat || new THREE.Quaternion());
     this.currentQuat.copy(this.initQuat);
     this.figGroup.quaternion.copy(this.currentQuat);
@@ -2309,7 +2310,16 @@ document.addEventListener('keydown', e => {
 window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('loading').style.display = 'none';
-    showScreen('screen-condition');
+
+    // If a condition is specified in the URL (e.g. ?condition=VR-R), skip the
+    // condition-selection screen and go straight to the participant info screen.
+    const VALID_CONDITIONS = ['2D', '3D', 'VR-NR', 'VR'];
+    const urlCond = new URLSearchParams(window.location.search).get('condition');
+    if (urlCond && VALID_CONDITIONS.includes(urlCond)) {
+      selectCondition(urlCond);   // sets session.condition and shows screen-intro
+    } else {
+      showScreen('screen-condition');
+    }
   }, 200);
 });
 
