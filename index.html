@@ -2311,12 +2311,24 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     document.getElementById('loading').style.display = 'none';
 
-    // If a condition is specified in the URL (e.g. ?condition=VR-R), skip the
-    // condition-selection screen and go straight to the participant info screen.
-    const VALID_CONDITIONS = ['2D', '3D', 'VR-NR', 'VR'];
-    const urlCond = new URLSearchParams(window.location.search).get('condition');
-    if (urlCond && VALID_CONDITIONS.includes(urlCond)) {
-      selectCondition(urlCond);   // sets session.condition and shows screen-intro
+    // If a ?condition= param is present, skip condition-selection and go straight
+    // to the participant info screen. Matching is case-insensitive; several aliases
+    // are accepted so links like ?condition=VR-R or ?condition=desktop-nr also work.
+    const COND_ALIASES = {
+      '2d': '2D', 'desktop-nr': '2D', 'desktop_nr': '2D',
+      '3d': '3D', 'desktop-r':  '3D', 'desktop_r':  '3D',
+      'vr-nr': 'VR-NR', 'vr_nr': 'VR-NR',
+      'vr': 'VR', 'vr-r': 'VR', 'vr_r': 'VR',
+    };
+    const raw     = (new URLSearchParams(window.location.search).get('condition') || '').trim();
+    const urlCond = COND_ALIASES[raw.toLowerCase()];
+    if (urlCond) {
+      try {
+        selectCondition(urlCond);
+      } catch (e) {
+        console.error('[MRT] URL condition auto-select failed:', e);
+        showScreen('screen-condition');
+      }
     } else {
       showScreen('screen-condition');
     }
