@@ -567,7 +567,9 @@ function makeTrial(figIdx, isPractice, num, block) {
   return {
     figIdx,
     positions:     BASE_FIGURES[figIdx],
-    targetQuat:    randomQuat(),
+    targetQuat:    new THREE.Quaternion()
+                     .setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 6)  // 30° tilt left
+                     .multiply(randomQuat()),
     options: optQuats.map((q, i) => ({
       quat:     q,
       mirrored: wrongSlots.includes(i),
@@ -1979,10 +1981,15 @@ function selectCondition(cond) {
   session.condition = cond;
 
   const desc = {
-    '2D': `<p>You will see a <strong>static 3-D target object</strong> and four answer options.
-            Select the two that match the target shape (just rotated, not mirrored).</p>`,
-    '3D': `<p>You will see a <strong>3-D target object</strong> you can <strong>click and drag</strong>
-            to rotate. Select the two answer options that match it.</p>`,
+    '2D': `<p>You will see a <strong>static 3D target shape</strong> and 4 answer options.
+            You cannot rotate that shape. Your goal is to select the 2 answer options
+            that are the same as the target shape. Only 2 are correct, the other 2 are
+            mirrored images.</p>
+            <p>You will get 2 practice trials and 5 main trials. The score is only visible at the end.</p>`,
+    '3D': `<p>You will see a <strong>3D target shape</strong> which you can <strong>click and drag
+            to rotate</strong>. Your goal is to select the 2 answer options that are the same
+            as the target shape. Only 2 are correct, the other 2 are mirrored images.</p>
+            <p>You will get 2 practice trials and 5 main trials. The score is only visible at the end.</p>`,
     'VR': `<p>This session will run in your <strong>VR headset</strong>. Open this page in the
             <strong>Meta Quest Browser</strong>, then click <em>Enter VR</em>.</p>`,
     'VR-NR': `<p>This session will run in your <strong>VR headset</strong>. The target shape is
