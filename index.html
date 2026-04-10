@@ -569,7 +569,7 @@ function makeTrial(figIdx, isPractice, num, block) {
     positions:     BASE_FIGURES[figIdx],
     targetQuat:    new THREE.Quaternion()
                      .setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 9) // 20° tilt up
-                     .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 6))  // 30° tilt left
+                     .premultiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), Math.PI / 12))  // 15° tilt left
                      .multiply(randomQuat()),
     options: optQuats.map((q, i) => ({
       quat:     q,
