@@ -352,10 +352,6 @@ select option { background: var(--surface2); }
     <h1>Shape Rotation Task</h1>
     <div id="intro-desc"></div>
     <div class="field">
-      <label for="pid">Participant ID</label>
-      <input type="text" id="pid" placeholder="e.g. P001" maxlength="60" autocomplete="off">
-    </div>
-    <div class="field">
       <label for="sector">Sector</label>
       <select id="sector">
         <option value="">— select your sector —</option>
@@ -2023,14 +2019,12 @@ function selectCondition(cond) {
 
   showScreen('screen-intro');
 
-  // Enable Continue only when all three fields are filled
+  // Enable Continue only when sector and role are filled (PID is auto-generated)
   const recheck = () => {
-    const pid    = document.getElementById('pid').value.trim();
     const sector = document.getElementById('sector').value;
     const role   = document.getElementById('role').value.trim();
-    document.getElementById('intro-btn').disabled = !(pid && sector && role);
+    document.getElementById('intro-btn').disabled = !(sector && role);
   };
-  document.getElementById('pid').addEventListener('input', recheck);
   document.getElementById('sector').addEventListener('change', recheck);
   document.getElementById('role').addEventListener('input', recheck);
   recheck();
@@ -2040,14 +2034,8 @@ function selectCondition(cond) {
    introNext  — validate fields, branch by condition
    ---------------------------------------------------------------- */
 function introNext() {
-  const pid    = document.getElementById('pid').value.trim();
   const sector = document.getElementById('sector').value;
   const role   = document.getElementById('role').value.trim();
-  if (!pid) {
-    document.getElementById('pid').style.borderColor = 'var(--wrong)';
-    document.getElementById('pid').focus();
-    return;
-  }
   if (!sector) {
     document.getElementById('sector').style.borderColor = 'var(--wrong)';
     document.getElementById('sector').focus();
@@ -2059,7 +2047,9 @@ function introNext() {
     return;
   }
 
-  session.participantId = pid;
+  // Auto-generate a unique participant ID (timestamp + random suffix)
+  session.participantId = 'P-' + Date.now().toString(36).toUpperCase()
+                        + '-' + Math.random().toString(36).substr(2, 4).toUpperCase();
   session.sector        = sector;
   session.role          = role;
   session.startTime     = new Date().toISOString();
@@ -2319,6 +2309,8 @@ window.addEventListener('load', () => {
       '3d': '3D', 'desktop-r':  '3D', 'desktop_r':  '3D',
       'vr-nr': 'VR-NR', 'vr_nr': 'VR-NR',
       'vr': 'VR', 'vr-r': 'VR', 'vr_r': 'VR',
+      // Randomly assign one of the two desktop conditions on each page load
+      'desktop-random': Math.random() < 0.5 ? '2D' : '3D',
     };
     const raw     = (new URLSearchParams(window.location.search).get('condition') || '').trim();
     const urlCond = COND_ALIASES[raw.toLowerCase()];
